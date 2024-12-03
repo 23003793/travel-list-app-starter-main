@@ -1,52 +1,43 @@
 import React, { useState } from "react";
 
-// Initial items in the packing list
+// Initial list of items
 const initialItems = [
   { id: 1, description: "Shirt", quantity: 5, packed: false },
   { id: 2, description: "Pants", quantity: 2, packed: false },
 ];
 
-// Logo Component: Displays the title of the app
+// Logo Component
 function Logo() {
-  return <h1>My Travel List</h1>;
+  return <h1>My Travel List</h1>; // Displays the app's title
 }
 
-// Form Component: Handles adding new items to the list
+// Form Component for adding items
 function Form({ onAddItem }) {
-  // State to manage item description input
-  const [itemDescription, setItemDescription] = useState("");
-  // State to manage quantity input
-  const [quantity, setQuantity] = useState(1);
+  const [itemDescription, setItemDescription] = useState(""); // State to store the item description
+  const [quantity, setQuantity] = useState(1); // State to store the quantity
 
-  // Function to handle form submission
+  // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent the form from refreshing the page
+    e.preventDefault();
+    if (!itemDescription.trim()) return; // Do nothing if description is empty
 
-    // Check if the description is empty
-    if (!itemDescription.trim()) return;
-
-    // Create a new item object with user input
+    // Create a new item
     const newItem = {
-      id: Date.now(), // Generate a unique ID using the current timestamp
-      description: itemDescription, // User-entered item description
-      quantity: quantity, // User-selected quantity
-      packed: false, // Default value for new items
+      id: Date.now(), // Unique ID based on current timestamp
+      description: itemDescription,
+      quantity,
+      packed: false,
     };
 
-    // Add the new item to the parent component's state
-    onAddItem(newItem);
-
-    // Reset the input fields to default values
-    setItemDescription(""); // Clear the description field
-    setQuantity(1); // Reset the quantity to 1
+    onAddItem(newItem); // Pass the new item to the parent component
+    setItemDescription(""); // Reset the form fields
+    setQuantity(1);
   };
 
   return (
     <form className="add-form" onSubmit={handleSubmit}>
       <h3>What do you need to pack?</h3>
-
-      {/* Dropdown to select item quantity */}
-      <label htmlFor="quantity"></label>
+      {/* Dropdown to select quantity */}
       <select
         id="quantity"
         value={quantity}
@@ -59,8 +50,7 @@ function Form({ onAddItem }) {
           </option>
         ))}
       </select>
-
-      {/* Input field for item description */}
+      {/* Input for item description */}
       <input
         type="text"
         placeholder="Item..."
@@ -68,8 +58,7 @@ function Form({ onAddItem }) {
         onChange={(e) => setItemDescription(e.target.value)}
         style={{ padding: "5px", margin: "5px 0", display: "block" }}
       />
-
-      {/* Button to submit the form */}
+      {/* Submit button */}
       <button type="submit" style={{ marginTop: "10px" }}>
         Add
       </button>
@@ -77,12 +66,11 @@ function Form({ onAddItem }) {
   );
 }
 
-// PackingList Component: Displays all items in the list
+// Component to render the list of items
 function PackingList({ items, onTogglePacked, onDeleteItem }) {
   return (
     <div className="list">
       <ul>
-        {/* Map over the items and render an Item component for each */}
         {items.map((item) => (
           <Item
             key={item.id}
@@ -96,11 +84,11 @@ function PackingList({ items, onTogglePacked, onDeleteItem }) {
   );
 }
 
-// Item Component: Represents a single item in the packing list
+// Individual Item Component
 function Item({ item, onTogglePacked, onDeleteItem }) {
   return (
     <li
-      style={{ textDecoration: item.packed ? "line-through" : "none" }} // Strike-through if packed
+      style={{ textDecoration: item.packed ? "line-through" : "none" }} // Strikethrough if packed
     >
       {/* Checkbox to toggle packed status */}
       <input
@@ -109,9 +97,8 @@ function Item({ item, onTogglePacked, onDeleteItem }) {
         onChange={() => onTogglePacked(item.id)}
         style={{ marginRight: "10px" }}
       />
-      {/* Display item description and quantity */}
-      {item.description} ({item.quantity})
-      {/* Button to delete the item */}
+      {item.description} ({item.quantity}) {/* Display item details */}
+      {/* Delete button */}
       <button
         onClick={() => onDeleteItem(item.id)}
         style={{
@@ -128,39 +115,40 @@ function Item({ item, onTogglePacked, onDeleteItem }) {
   );
 }
 
-// Stats Component: Displays statistics about the packing list
+// Stats Component to show packing statistics
 function Stats({ items }) {
-  // Total number of items
-  const totalItems = items.length;
-  // Number of packed items
-  const packedItems = items.filter((item) => item.packed).length;
-  // Percentage of items packed (rounded)
+  const totalItems = items.length; // Total number of items
+  const packedItems = items.filter((item) => item.packed).length; // Number of packed items
   const packedPercentage = totalItems
     ? Math.round((packedItems / totalItems) * 100)
-    : 0;
+    : 0; // Calculate percentage of packed items
 
   return (
     <footer className="stats">
-      <em>
-        You have {totalItems} items in the list. You already packed {packedItems}{" "}
-        ({packedPercentage}%).
-      </em>
+      {/* Display appropriate message based on packing status */}
+      {packedPercentage === 100 && totalItems > 0 ? (
+        <em>You got everything!</em>
+      ) : (
+        <em>
+          You have {totalItems} items in the list. You already packed {packedItems} (
+          {packedPercentage}%).
+        </em>
+      )}
     </footer>
   );
 }
 
-// Main App Component: Combines all components and manages state
+// Main App Component
 function App() {
-  // Responsible for supplying data to the child component
-  // State to manage the list of items
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState(initialItems); // State to store the list of items
+  const [sortBy, setSortBy] = useState("inputOrder"); // State for sorting method
 
-  // Function to add a new item to the list
+  // Add a new item to the list
   const handleAddItem = (newItem) => {
-    setItems([...items, newItem]); // Add the new item to the existing list
+    setItems([...items, newItem]);
   };
 
-  // Function to toggle the packed status of an item
+  // Toggle the packed status of an item
   const handleTogglePacked = (id) => {
     setItems(
       items.map((item) =>
@@ -169,22 +157,67 @@ function App() {
     );
   };
 
-  // Function to delete an item from the list
+  // Delete an item from the list
   const handleDeleteItem = (id) => {
-    setItems(items.filter((item) => item.id !== id)); // Remove the item with the specified ID
+    setItems(items.filter((item) => item.id !== id));
   };
+
+  // Clear all items
+  const handleClearItems = () => {
+    if (window.confirm("Are you sure you want to clear all items?")) {
+      setItems([]);
+    }
+  };
+
+  // Sort the items based on the selected method
+  const sortedItems = [...items].sort((a, b) => {
+    if (sortBy === "description") {
+      return a.description.localeCompare(b.description); // Alphabetical sort by description
+    } else if (sortBy === "packed") {
+      return a.packed - b.packed; // Sort by packed status
+    }
+    return 0; // Default order (input order)
+  });
 
   return (
     <div className="app">
-      {/* Render the Logo, Form, PackingList, and Stats components */}
       <Logo />
       <Form onAddItem={handleAddItem} />
+      {/* Packing List rendered after the form */}
       <PackingList
-        items={items}
+        items={sortedItems}
         onTogglePacked={handleTogglePacked}
         onDeleteItem={handleDeleteItem}
       />
-      <Stats items={items} />
+      <div>
+        {/* Sorting controls */}
+        <label>Sort by: </label>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          style={{ margin: "10px 0" }}
+        >
+          <option value="inputOrder">Input Order</option>
+          <option value="description">Description</option>
+          <option value="packed">Packed Status</option>
+        </select>
+        {/* Clear All button */}
+        <button
+          onClick={handleClearItems}
+          style={{
+            marginLeft: "10px",
+            padding: "5px 10px",
+            cursor: "pointer",
+            backgroundColor: "red",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+          }}
+        >
+          Clear All
+        </button>
+      </div>
+      <Stats items={items} /> {/* Packing stats at the bottom */}
     </div>
   );
 }
